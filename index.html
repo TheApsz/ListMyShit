@@ -5,9 +5,9 @@
 <!-- HTML Meta Tags -->
     <title>List my SHIT</title>
     <meta content="#ec2727" data-react-helmet="true" name="theme-color">
-    <meta name="description" content="Do you sometimes fucking forget what shit you wanted to do? well there you fucking go go list all of your stupid shit.">
-    <meta property="og:description" content="Do you sometimes fucking forget what shit you wanted to do? well there you fucking go go list all of your stupid shit.">
-    <meta name="twitter:description" content="Do you sometimes fucking forget what shit you wanted to do? well there you fucking go go list all of your stupid shit.">
+    <meta name="description" content="Do you sometimes fucking forget what shit you wanted to do? well there you fucking go list all of your stupid shit... LOCALY">
+    <meta property="og:description" content="Do you sometimes fucking forget what shit you wanted to do? well there you fucking go list all of your stupid shit... LOCALY">
+    <meta name="twitter:description" content="Do you sometimes fucking forget what shit you wanted to do? well there you fucking go list all of your stupid shit... LOCALY">
 
     <meta property="og:title" content="List my SHIT">
     <meta name="twitter:title" content="List my SHIT">
@@ -32,26 +32,65 @@
 
 
 <body>
+    <div id="background">
+        <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2F4kwallpapers.com%2Fimages%2Fwallpapers%2Fdark-blue-pink-2560x1080-12661.jpg&f=1&nofb=1&ipt=2169ee7e04b23e0489f16b9ce6ab9c6712919fb158489bf71194ab2e97b35bc0" alt="Background image">
+    </div>
+
+    <div id="safe">
+        <div id="panel" class="border trans-med">
+            <div class="button">
+                <span class="material-symbols-rounded">add</span>
+                <h3>Add...</h3>
+            </div>
+            <hr>
+            <div class="button">
+                <span class="material-symbols-rounded">settings</span>
+                <h2>Preferences</h2>
+            </div>
+
+            <div id="panel-add" class="panel-extend active border trans-med">
+                <div class="button">
+                    <span class="material-symbols-rounded">category</span>
+                    <h2>Category</h2>
+                </div>
+                <div class="button">
+                    <span class="material-symbols-rounded">add_box</span>
+                    <h2>Item</h2>
+                </div>
+                <div class="button">
+                    <span class="material-symbols-rounded">text_fields</span>
+                    <h2>Text</h2>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
 </body>
 
 <style>
 :root {
-       /* Backgrounds */
-       --bg: rgb(11, 11, 13);
-       --bg2: rgba(16, 16, 18, 1);
-       --bgtrans: rgba(0, 0, 0, 0.2);
-       --bgtrans2: rgba(255, 255, 255, 0.01);
+    /* Backgrounds */
+    --bg: rgb(11, 11, 13);
+    --bg2: rgba(16, 16, 18, 1);
+    --bgtrans: rgba(0, 0, 0, 0.2);
+    --bgtrans2: rgba(255, 255, 255, 0.01);
 
-       /* Text */
-       --txt: rgb(236, 241, 233);
+    /* Text */
+    --txt: rgb(236, 241, 233);
 
-       /* Colors */
-       --pri: rgb(236, 39, 39);
-       --pri2: rgba(236, 39, 39, 0.2);
-       --sec: rgb(253, 114, 114);
+    /* Colors */
+    --primary: 255, 255, 255;
+    --pri: rgb(var(--primary));
+    --pri2: rgba(var(--primary), 0.2);
 
-       /* Some important stuff */
-       --header-width: auto;
+    /* Some important stuff */
+    --header-width: auto;
+
+
+    /* Custumisable */
+    --safe: 25px;
+    --br: 10px;
 }
 </style>
 
