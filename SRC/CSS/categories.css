@@ -1,0 +1,29 @@
+#categories {
+    position: relative;
+    background: transparent;
+    min-width: 250px;
+    padding: 10px;
+    min-height: 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+
+    .indicator {
+        background: white;
+        height: 10px;
+        width: 250px;
+        opacity: 0.8;
+        animation: category-indicator 2s infinite ease-in-out;
+    }
+}
+@keyframes category-indicator {
+    from {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 0.2;
+    }
+    100% {
+        opacity: 0.8;
+    }
+}
