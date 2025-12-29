@@ -14,16 +14,119 @@
         width: 250px;
         opacity: 0.8;
         animation: category-indicator 2s infinite ease-in-out;
+
+        &.hidden {
+            opacity: 0;
+            animation: 0;
+            transition: 1s ease;
+        }
+    }
+    .cat {
+        position: relative;
+        background: rgba(255, 255, 255, 0);
+        width: 250px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 5px;
+
+        hr {
+            width: 100%;
+            border-style: dashed;
+            opacity: 0.3;
+        }
+        .catTitle {
+            color: var(--pri);
+            font-size: 15px;
+        }
+        .card {
+            position: relative;
+            background: rgba(255,255,255,0.01);
+            width: 100%;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 0px;
+            transition: 0.3s ease;
+            transition-delay: 0.2s;
+
+                &:hover {
+                    border-top-right-radius: 20px !important;
+                    corner-shape: round scoop round round;
+                    transition-delay: 0s;
+
+                    .cardEdit {
+                        opacity: 1;
+                        scale: 1;
+                    }
+                }
+            
+
+            .cardEdit {
+                position: absolute;
+                top: 0;
+                right: 0;
+                background: var(--bg2);
+                translate: 50% -50%;
+                aspect-ratio: 1;
+                width: 25px;
+                border-radius: 50% !important;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                transition: 0.2s ease;
+                transition-delay: 0.2s;
+                opacity: 0;
+                scale: 0.8;
+                cursor: pointer;
+
+                span {
+                    font-size: 15px;
+                }
+            }
+            
+            h3 {
+                font-size: 14px;
+                letter-spacing: 0px;
+                color: var(--pri);
+            }
+            h2 {
+                font-size: 10px;
+                opacity: 0.7;
+            }
+            .cardLabel {
+                background: transparent;
+                position: relative;
+                width: 100%;
+                height: 5px;
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                gap: 5px;
+                margin-top: 5px;
+
+                .cardLabelLabel {
+                    position: relative;
+                    background: white;
+                    height: 100%;
+                    width: 40px;
+                }
+            }
+        }
     }
 }
 @keyframes category-indicator {
     from {
-        opacity: 0.8;
+        opacity: 0;
     }
     50% {
-        opacity: 0.2;
+        opacity: 0.8;
     }
     100% {
-        opacity: 0.8;
+        opacity: 0;
     }
 }

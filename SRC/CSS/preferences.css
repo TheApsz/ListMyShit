@@ -16,6 +16,7 @@
     pointer-events: none;
     scale: 0.9;
     transition: opacity 0.1s ease, scale 0.3s cubic-bezier(.17,1.67,.61,.81);
+    z-index: 9998;
 
     &.active {
         opacity: 1;

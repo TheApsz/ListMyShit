@@ -40,7 +40,7 @@
 
     <div id="safe">
         <div id="panel" class="border trans-med">
-            <div id="panel-add-button" class="button">
+            <div id="panel-add-button" class="button panelAdditive">
                 <span class="material-symbols-rounded">add</span>
                 <h3>Add...</h3>
             </div>
@@ -65,7 +65,7 @@
                 </div>
             </div>
         </div>
-        <div id="preferences" class="border trans-med">
+        <div id="preferences" class="border trans-med active">
             <div class="title-wrapper">
                 <h1>Preferences</h1>
                 <div id="preferences-close" class="button">
@@ -88,6 +88,20 @@
         </div>
 
         <div id="categories">
+            <div class="cat trans-med">
+                <h3 class="catTitle">Category Title its cool i think</h3>
+                <hr>
+                <div class="card">
+                    <div class="cardEdit button">
+                        <span class="material-symbols-rounded">edit</span>
+                    </div>
+                    <h3>Card title</h3>
+                    <h2>Card description text goes here</h2>
+                    <div class="cardLabel">
+                        <div class="cardLabelLabel"></div>
+                    </div>
+                </div>
+            </div>
             <div class="indicator"></div>
         </div>
     </div>
@@ -116,6 +130,9 @@
     /* Custumisable */
     --safe: 25px;
     --br: 10px;
+}
+
+* {
 }
 </style>
 
