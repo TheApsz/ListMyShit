@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Trello-Lite with Deadlines</title>
+    <style>
+        :root {
+            --bg-color: #f4f5f7;
+            --column-bg: #ebecf0;
+            --card-bg: #ffffff;
+            --text-color: #172b4d;
+            --text-sub: #5e6c84;
+            --primary: #0079bf;
+            --danger: #eb5a46;
+            --warning: #f2d600;
+            --success: #61bd4f;
+            --shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+
+        body.dark-mode {
+            --bg-color: #1e2125;
+            --column-bg: #2c333a;
+            --card-bg: #22272b;
+            --text-color: #b6c2cf;
+            --text-sub: #9fadbc;
+            --shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 { margin: 0; font-size: 1.5rem; }
+
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.8; }
+
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-toggle { background-color: var(--column-bg); color: var(--text-color); margin-right: 10px;}
+
+        /* Board Layout */
+        .board {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            height: calc(100vh - 100px);
+            align-items: flex-start;
+        }
+
+        .column {
+            background-color: var(--column-bg);
+            border-radius: 8px; /* Rounded corners like Trello */
+            width: 300px;
+            min-width: 300px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            max-height: 100%;
+        }
+
+        .column-header {
+            padding: 8px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-color);
+        }
+
+        .task-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            min-height: 100px;
+            padding: 4px;
+        }
+
+        /* Task Cards */
+        .task-card {
+            background-color: var(--card-bg);
+            border-radius: 6px; /* Slightly rounded */
+            padding: 10px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow);
+            cursor: grab;
+            position: relative;
+        }
+
+        .task-card:active { cursor: grabbing; }
+
+        .task-title { font-weight: 600; margin-bottom: 5px; display: block;}
+        
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-top: 8px;
+        }
+
+        .priority-tag {
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .p-high { background-color: var(--danger); }
+        .p-medium { background-color: var(--warning); color: #333; }
+        .p-low { background-color: var(--success); }
+
+        .deadline {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .deadline.overdue {
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        .delete-btn {
+            background: none;
+            color: var(--text-sub);
+            padding: 0;
+            font-size: 1.2rem;
+        }
+        .delete-btn:hover { color: var(--danger); }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 0.9rem; }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #dfe1e6;
+            border-radius: 4px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            box-sizing: border-box;
+        }
+        
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>📋 Project Board</h1>
+    <div>
+        <button class="btn-toggle" onclick="toggleTheme()">🌓 Theme</button>
+        <button class="btn-primary" onclick="openModal()">+ Add Task</button>
+    </div>
+</header>
+
+<div class="board">
+    <div class="column" ondrop="drop(event)" ondragover="allowDrop(event)" id="todo">
+        <div class="column-header">To Do <span id="count-todo">0</span></div>
+        <div class="task-list" id="list-todo"></div>
+    </div>
+
+    <div class="column" ondrop="drop(event)" ondragover="allowDrop(event)" id="inprogress">
+        <div class="column-header">In Progress <span id="count-inprogress">0</span></div>
+        <div class="task-list" id="list-inprogress"></div>
+    </div>
+
+    <div class="column" ondrop="drop(event)" ondragover="allowDrop(event)" id="done">
+        <div class="column-header">Done <span id="count-done">0</span></div>
+        <div class="task-list" id="list-done"></div>
+    </div>
+</div>
+
+<div class="modal" id="taskModal">
+    <div class="modal-content">
+        <h2>New Task</h2>
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="taskTitle" placeholder="e.g. Fix Navigation Bar">
+        </div>
+        <div class="form-group">
+            <label>Priority</label>
+            <select id="taskPriority">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Deadline (Date & Time)</label>
+            <input type="datetime-local" id="taskDeadline">
+        </div>
+        <div class="modal-actions">
+            <button onclick="closeModal()" style="background: transparent; color: var(--text-color);">Cancel</button>
+            <button class="btn-primary" onclick="saveTask()">Save Task</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- State Management ---
+    let tasks = JSON.parse(localStorage.getItem('myTasks')) || [];
+    let draggedItem = null;
+
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+        renderBoard();
+        checkDeadlines(); // Run initial check
+        // Check local storage for theme
+        if(localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    });
+
+    // --- Core Logic ---
+
+    function renderBoard() {
+        // Clear all columns
+        ['todo', 'inprogress', 'done'].forEach(status => {
+            document.getElementById(`list-${status}`).innerHTML = '';
+            let count = tasks.filter(t => t.status === status).length;
+            document.getElementById(`count-${status}`).innerText = count;
+        });
+
+        // Render tasks
+        tasks.forEach(task => {
+            const card = document.createElement('div');
+            card.className = 'task-card';
+            card.draggable = true;
+            card.dataset.id = task.id;
+            
+            // Format Date
+            let dateDisplay = "";
+            let overdueClass = "";
+            if (task.deadline) {
+                const d = new Date(task.deadline);
+                dateDisplay = d.toLocaleString([], {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'});
+                if (new Date() > d && task.status !== 'done') {
+                    overdueClass = "overdue";
+                    dateDisplay = "⚠️ " + dateDisplay;
+                } else {
+                    dateDisplay = "🕒 " + dateDisplay;
+                }
+            }
+
+            card.innerHTML = `
+                <span class="task-title">${task.title}</span>
+                <div class="task-meta">
+                    <span class="priority-tag p-${task.priority}">${task.priority}</span>
+                    <span class="deadline ${overdueClass}">${dateDisplay}</span>
+                    <button class="delete-btn" onclick="deleteTask(${task.id})">&times;</button>
+                </div>
+            `;
+
+            // Drag Events
+            card.addEventListener('dragstart', (e) => {
+                draggedItem = task;
+                e.target.style.opacity = '0.5';
+            });
+            card.addEventListener('dragend', (e) => {
+                e.target.style.opacity = '1';
+                draggedItem = null;
+            });
+
+            document.getElementById(`list-${task.status}`).appendChild(card);
+        });
+    }
+
+    function saveTask() {
+        const title = document.getElementById('taskTitle').value;
+        const priority = document.getElementById('taskPriority').value;
+        const deadline = document.getElementById('taskDeadline').value;
+
+        if (!title) return alert("Please enter a title");
+
+        const newTask = {
+            id: Date.now(),
+            title: title,
+            priority: priority,
+            deadline: deadline,
+            status: 'todo'
+        };
+
+        tasks.push(newTask);
+        updateStorage();
+        renderBoard();
+        closeModal();
+        
+        // Reset form
+        document.getElementById('taskTitle').value = '';
+        document.getElementById('taskDeadline').value = '';
+    }
+
+    function deleteTask(id) {
+        if(confirm("Delete this task?")) {
+            tasks = tasks.filter(t => t.id !== id);
+            updateStorage();
+            renderBoard();
+        }
+    }
+
+    // --- Drag and Drop Logic ---
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        // Find the closest column id
+        const column = ev.target.closest('.column');
+        if (column && draggedItem) {
+            const newStatus = column.id;
+            // Update task status
+            const taskIndex = tasks.findIndex(t => t.id === draggedItem.id);
+            if (taskIndex > -1) {
+                tasks[taskIndex].status = newStatus;
+                updateStorage();
+                renderBoard();
+            }
+        }
+    }
+
+    // --- Utilities ---
+
+    function updateStorage() {
+        localStorage.setItem('myTasks', JSON.stringify(tasks));
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    }
+
+    function openModal() { document.getElementById('taskModal').classList.add('active'); }
+    function closeModal() { document.getElementById('taskModal').classList.remove('active'); }
+
+    // Check for overdue tasks every minute to update UI
+    setInterval(() => {
+        renderBoard();
+    }, 60000);
+
+</script>
+</body>
+</html>

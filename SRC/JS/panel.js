@@ -28,9 +28,11 @@ $(document).ready(function() {
     });
 
     $('.button-close').on('click', function() {
-        $('#panel').removeClass('active');
-        $('.panel-extend').removeClass('active');
-        console.log('System | Panel | Force Inactive');
+        setTimeout(function() {
+            $('#panel').removeClass('active');
+            $('.panel-extend').removeClass('active');
+            console.log('System | Panel | Force Inactive');
+        }, 10); // 100ms delay
     });
     $('#panel-add-button').on('click', function() {
         $('#panel-add').toggleClass('active');

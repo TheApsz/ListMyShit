@@ -1,3 +1,124 @@
+// Card saving/loading logic
+const CARD_STORAGE_KEY = 'listmyshit-cards';
+
+export function getAllCardData() {
+    const cards = document.querySelectorAll('.card');
+    const data = {};
+    cards.forEach(card => {
+        let id = card.dataset.identifier;
+        if (!id || id.length !== 7) {
+            id = randomIdentifier();
+            card.dataset.identifier = id;
+            card.setAttribute('data-identifier', id);
+        }
+
+        let parent = 'safe';
+        let order = 0;
+        if (card.parentElement && card.parentElement.classList.contains('cat')) {
+            const cats = Array.from(document.querySelectorAll('.cat'));
+            const idx = cats.indexOf(card.parentElement);
+            if (idx !== -1) parent = `cat-${idx}`;
+            order = Array.from(card.parentElement.children).filter(c => c.classList.contains('card')).indexOf(card);
+        } else if (card.parentElement && card.parentElement.id === 'safe') {
+            order = Array.from(card.parentElement.children).filter(c => c.classList.contains('card')).indexOf(card);
+        }
+        data[id] = {
+            title: card.dataset.title || '',
+            description: card.dataset.description || '',
+            posX: card.getAttribute('data-pos-x') || '',
+            posY: card.getAttribute('data-pos-y') || '',
+            parent: parent,
+            order: order
+        };
+    });
+    return data;
+}
+
+export function saveAllCards() {
+    const data = getAllCardData();
+    localStorage.setItem(CARD_STORAGE_KEY, JSON.stringify(data));
+}
+
+export function loadAllCards() {
+    const raw = localStorage.getItem(CARD_STORAGE_KEY);
+    if (!raw) return {};
+    let data = {};
+    try { data = JSON.parse(raw); } catch (e) { return {}; }
+    return data;
+}
+
+export function restoreCardsToDOM() {
+    document.querySelectorAll('.card[data-identifier]').forEach(card => card.remove());
+
+    const data = loadAllCards();
+    Object.entries(data).forEach(([id, cardData]) => {
+        // Create card element
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.setAttribute('data-identifier', id);
+        card.setAttribute('data-title', cardData.title);
+        card.setAttribute('data-description', cardData.description);
+        if (cardData.posX) card.setAttribute('data-pos-x', cardData.posX);
+        if (cardData.posY) card.setAttribute('data-pos-y', cardData.posY);
+        if (cardData.posX) card.style.setProperty('--card-pos-x', cardData.posX + 'px');
+        if (cardData.posY) card.style.setProperty('--card-pos-y', cardData.posY + 'px');
+        card.innerHTML = `
+            <div class="cardEdit button">
+                <span class="material-symbols-rounded">edit</span>
+            </div>
+            <h3></h3>
+            <h2></h2>
+            <div class="cardLabel">
+                <div class="cardLabelLabel"></div>
+            </div>
+        `;
+
+        let parentElem;
+        if (cardData.parent && cardData.parent.startsWith('cat-')) {
+            const idx = parseInt(cardData.parent.replace('cat-', ''));
+            const cats = document.querySelectorAll('.cat');
+            if (cats[idx]) {
+                parentElem = cats[idx];
+            } else {
+                parentElem = document.getElementById('safe');
+                card.classList.add('cardFree');
+            }
+        } else {
+            parentElem = document.getElementById('safe');
+            card.classList.add('cardFree');
+        }
+        // Insert at correct order
+        const cardsInParent = Array.from(parentElem.children).filter(c => c.classList.contains('card'));
+        if (cardData.order !== undefined && cardData.order >= 0 && cardData.order < cardsInParent.length) {
+            parentElem.insertBefore(card, cardsInParent[cardData.order]);
+        } else {
+            parentElem.appendChild(card);
+        }
+    });
+}
+
+export function updateCardElementsFromData() {
+    document.querySelectorAll('.card').forEach(card => {
+        let id = card.dataset.identifier;
+        if (!id || id.length !== 7) {
+            id = randomIdentifier();
+            card.dataset.identifier = id;
+            card.setAttribute('data-identifier', id);
+        }
+        const title = card.dataset.title || '';
+        const desc = card.dataset.description || '';
+        const h3 = card.querySelector('h3');
+        const h2 = card.querySelector('h2');
+        if (h3) h3.textContent = title;
+        if (h2) h2.textContent = desc;
+    });
+}
+// Generate a random 7-digit identifier (string)
+export function randomIdentifier() {
+    return Math.floor(1000000 + Math.random() * 9000000).toString();
+}
+
+
 // save.js
 // Handles saving and loading app state (like preferences) to localStorage in a JSON-like format
 // This is ai generated and will be researched to learn how to do local storage properly

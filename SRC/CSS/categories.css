@@ -6,6 +6,8 @@
     min-height: 10px;
     display: flex;
     flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
     gap: 10px;
 
     .indicator {
@@ -41,7 +43,9 @@
             color: var(--pri);
             font-size: 15px;
         }
-        .card {
+    }
+}
+.card {
             position: relative;
             background: rgba(255,255,255,0.01);
             width: 100%;
@@ -53,6 +57,17 @@
             gap: 0px;
             transition: 0.3s ease;
             transition-delay: 0.2s;
+
+            &.dragging {
+                width: 250px;
+                transition: 00s ease-out;
+            }
+            &.cardFree {
+                position: absolute !important;
+                width: 250px;
+                left: var(--card-pos-x, 0px);
+                top: var(--card-pos-y, 0px);
+            }
 
                 &:hover {
                     border-top-right-radius: 20px !important;
@@ -117,8 +132,6 @@
                 }
             }
         }
-    }
-}
 @keyframes category-indicator {
     from {
         opacity: 0;
